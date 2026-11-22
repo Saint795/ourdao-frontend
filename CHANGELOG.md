@@ -42,6 +42,7 @@ report can name the entry below it came from. See
 - Upgraded `@stellar/stellar-sdk` to `^17.1.0` and added migration plan and testnet smoke verification checklist (#383).
 
 ### Fixed
+- Keyboard users can focus and open the treasury salt backup picker, and assistive technologies can identify the document encryption and decryption password fields (#584, #585, #586).
 - Test suite: the contract-id fixture is generated with `StrKey.encodeContract` (#537); partial `@/lib/stellar` mocks spread `importOriginal()` (#538); `error-reporting.test.ts` runs in jsdom (#539). A signature cancelled before the wallet prompt opens now aborts instead of hanging.
 - A stake that fails to load or is still loading is shown as unavailable instead of `0`: the treasury and exit pages no longer show a zero stake or base voting weight, the dashboard shows `—` for voting weight, and staking or exiting is disabled until the stake is known (#486).
 - Members who committed a private vote without a stored salt can now import their salt backup from the proposal page and reveal the vote (#518).

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from './test-utils'
 import TreasuryProposalDetailPage from '@/app/(app)/treasury/[id]/page'
 
@@ -46,6 +47,7 @@ vi.mock('@/lib/dao-client', () => ({
     getTreasuryProposal: (...a: unknown[]) => mockGetTreasuryProposal(...a),
     hasVoted: (...a: unknown[]) => mockHasVoted(...a),
     getDocument: vi.fn().mockResolvedValue(null),
+    getToken: vi.fn().mockResolvedValue(null),
     getTotalMembers: vi.fn().mockResolvedValue(10),
     getActiveMembers: vi.fn().mockResolvedValue(8),
     getConsensusThreshold: vi.fn().mockResolvedValue(5100),
@@ -93,7 +95,7 @@ describe('TreasuryProposalDetailPage (/treasury/[id])', () => {
       expect(screen.getAllByText(/Treasury Proposal #42/)[0]).toBeInTheDocument()
     })
 
-    expect(screen.getByText('5')).toBeInTheDocument() // 50000000 stroops = 5 tokens
+    expect(screen.getByText('5 TOKEN')).toBeInTheDocument() // 50000000 stroops = 5 tokens
     expect(screen.getByText(/GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5/)).toBeInTheDocument()
     expect(screen.getByText('In Voting')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Vote For/i })).toBeInTheDocument()
@@ -252,7 +254,8 @@ describe('TreasuryProposalDetailPage (/treasury/[id])', () => {
 
     // #518: a member whose local salt is missing must still be able to import
     // the backup and reach the reveal buttons.
-    it('offers a salt import when the vote is committed but no salt is stored, and reveals after import', async () => {
+    it('tabs to the salt import and reveals after importing a backup', async () => {
+      const user = userEvent.setup()
       mockGetTreasuryProposal.mockResolvedValue(privateProposal)
       mockHasVoted.mockResolvedValue(true)
 
@@ -261,11 +264,17 @@ describe('TreasuryProposalDetailPage (/treasury/[id])', () => {
       await screen.findByText(/salt not found/i)
       expect(screen.queryByRole('button', { name: /Reveal FOR/i })).not.toBeInTheDocument()
 
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      expect(input).not.toBeNull()
+      const input = screen.getByLabelText('Import Salt Backup')
+      // jsdom does not load Tailwind's display utilities in component tests.
+      expect(input).not.toHaveClass('hidden')
+      for (let steps = 0; steps < 5 && document.activeElement !== input; steps += 1) {
+        await user.tab()
+      }
+      expect(document.activeElement).toBe(input)
+
       const backup = JSON.stringify({ proposalId: 42, address: 'GALICE', salt: '00'.repeat(32) })
       const file = new File([backup], 'salt.json', { type: 'application/json' })
-      fireEvent.change(input, { target: { files: [file] } })
+      await user.upload(input, file)
 
       expect(await screen.findByRole('button', { name: /Reveal FOR/i })).toBeInTheDocument()
     })
