@@ -20,6 +20,7 @@ report can name the entry below it came from. See
 ## [Unreleased]
 
 ### Added
+- Live DAO updates refresh affected pages as indexer events arrive. The app header shows connection status, and covered queries return to polling during an outage. Private notifications keep polling (#554).
 - A **Fund now** (loan) / **Execute** (treasury withdrawal) action on proposals that passed their vote while the treasury was short, so any member can complete them once the treasury is topped up; contract failures such as `InsufficientTreasury` are shown in plain language (#540).
 - A test guard that fails when a DOM-touching test file lands without `// @vitest-environment jsdom` (#539).
 - Per-module coverage floors for `dao-client.ts` and `wallet.tsx`, tests for every `daoWrite` entrypoint and the wallet connect/restore/sign flows, and a coverage provider pin matching the installed vitest (#327, #328, #329).
@@ -42,6 +43,7 @@ report can name the entry below it came from. See
 - Upgraded `@stellar/stellar-sdk` to `^17.1.0` and added migration plan and testnet smoke verification checklist (#383).
 
 ### Fixed
+- The IPFS CID field on the loan page has an accessible name, so screen readers announce its purpose after typing (#583).
 - Keyboard users can focus and open the treasury salt backup picker, and assistive technologies can identify the document encryption and decryption password fields (#584, #585, #586).
 - Test suite: the contract-id fixture is generated with `StrKey.encodeContract` (#537); partial `@/lib/stellar` mocks spread `importOriginal()` (#538); `error-reporting.test.ts` runs in jsdom (#539). A signature cancelled before the wallet prompt opens now aborts instead of hanging.
 - A stake that fails to load or is still loading is shown as unavailable instead of `0`: the treasury and exit pages no longer show a zero stake or base voting weight, the dashboard shows `—` for voting weight, and staking or exiting is disabled until the stake is known (#486).
@@ -62,7 +64,7 @@ report can name the entry below it came from. See
   successful treasury vote in the current member's vote state (#311, #318).
 
 Backend: ourdao-backend unversioned (main; no tagged release to pin yet)
-Contracts: ourdao-contracts @ 16e4222
+Contracts: ourdao-contracts @ 16e4222fbe77192ca888cd3739aca8fdb02150a4
 
 ## [0.1.0] - 2026-09-26
 

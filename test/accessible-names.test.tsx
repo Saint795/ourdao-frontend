@@ -18,11 +18,11 @@ import RequestLoanPage from '@/app/(app)/loans/request/page'
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/dashboard',
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }))
 
 vi.mock('@/lib/wallet', () => ({
-  useOptionalWallet: () => ({}),
+  useOptionalWallet: () => ({ address: null }),
   useWallet: () => ({
     address: 'GALICE',
     isConnected: true,
